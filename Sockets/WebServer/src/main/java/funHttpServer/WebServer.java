@@ -25,6 +25,7 @@ import java.util.Random;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.nio.charset.Charset;
+//import org.json.*;
 
 class WebServer {
   public static void main(String args[]) {
@@ -201,20 +202,27 @@ class WebServer {
           // extract path parameters
           query_pairs = splitQuery(request.replace("multiply?", ""));
 
-          // extract required fields from parameters
-          Integer num1 = Integer.parseInt(query_pairs.get("num1"));
-          Integer num2 = Integer.parseInt(query_pairs.get("num2"));
+	  try {  // see if inputs are valid
+            // extract required fields from parameters
+            Integer num1 = Integer.parseInt(query_pairs.get("num1"));
+            Integer num2 = Integer.parseInt(query_pairs.get("num2"));
+	  
+  	    // do math
+            Integer result = num1 * num2;
+            // Generate response
+            builder.append("HTTP/1.1 200 OK\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("Result is: " + result);
 
-          // do math
-          Integer result = num1 * num2;
+          } catch(NumberFormatException e) {   // invalid inputs
+              builder.append("HTTP/1.1 400 Bad Request\n");   // Error Code
+              builder.append("Invalid input\n");
+              builder.append("\n");
+	      System.out.println("Invalid Input\n");
+          }
 
-          // Generate response
-          builder.append("HTTP/1.1 200 OK\n");
-          builder.append("Content-Type: text/html; charset=utf-8\n");
-          builder.append("\n");
-          builder.append("Result is: " + result);
-
-          // TODO: Include error handling here with a correct error code and
+          // Included error handling code (400) here with a correct error code and
           // a response that makes sense
 
         } else if (request.contains("github?")) {
@@ -238,6 +246,7 @@ class WebServer {
           // amehlhase, 46384989 -> memoranda
           // amehlhase, 46384989 -> ser316examples
           // amehlhase, 46384989 -> test316
+
 
         } else {
           // if the request is not recognized at all
